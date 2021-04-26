@@ -41,7 +41,7 @@ func TestParseConfig(t *testing.T) {
 			  password xyz123`,
 	}
 	for e, input := range cases {
-		l, p := parseConfig(strings.NewReader(input), u)
+		l, p, _ := parseConfig(strings.NewReader(input), u.Host)
 		exp := strings.Split(e, "|")
 		g.Expect(l).To(Equal(exp[0]))
 		g.Expect(p).To(Equal(exp[1]))
