@@ -4,7 +4,7 @@ go:
   - "1.x"
 
 install:
-  - go get ./...
+  - go mod download
 
 script:
-  - go test -v --short ./...
+  - ./build+test.sh
