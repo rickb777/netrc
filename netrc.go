@@ -2,9 +2,9 @@
 //
 // netrc syntax consists of pairs of words
 //
-//   "machine" name
-//   "login" name
-//   "password" name
+//	"machine" name
+//	"login" name
+//	"password" name
 //
 // (others are ignored here)
 //
@@ -14,13 +14,12 @@
 //
 // Example .netrc content:
 //
-//    machine foo.com login user@example.com password a123456
+//	machine foo.com login user@example.com password a123456
 //
 // Example usage:
 //
-//    endpoint := "http://my.server.com/
-//    username, password := netrc.ReadConfig(endpoint, ".netrc", os.Getenv("HOME")+"/.netrc")
-//
+//	endpoint := "http://my.server.com/
+//	username, password := netrc.ReadConfig(endpoint, ".netrc", os.Getenv("HOME")+"/.netrc")
 package netrc
 
 import (
