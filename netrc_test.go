@@ -1,15 +1,13 @@
 package netrc
 
 import (
-	. "github.com/onsi/gomega"
+	"github.com/rickb777/expect"
 	"net/url"
 	"strings"
 	"testing"
 )
 
 func TestParseConfig(t *testing.T) {
-	g := NewGomegaWithT(t)
-
 	u, _ := url.Parse("https://my.server.com:444/foo")
 	cases := map[string]string{
 		// blank case
@@ -43,7 +41,7 @@ func TestParseConfig(t *testing.T) {
 	for e, input := range cases {
 		l, p, _ := parseConfig(strings.NewReader(input), u.Host)
 		exp := strings.Split(e, "|")
-		g.Expect(l).To(Equal(exp[0]))
-		g.Expect(p).To(Equal(exp[1]))
+		expect.String(l).ToBe(t, exp[0])
+		expect.String(p).ToBe(t, exp[1])
 	}
 }
