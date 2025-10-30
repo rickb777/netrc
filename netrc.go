@@ -1,10 +1,10 @@
-// package netrc provides functions to read .netrc files.
+// Package netrc provides functions to read .netrc files.
 //
-// netrc syntax consists of pairs of words
+// netrc syntax consists of groups of pairs of a noun and an identifier
 //
-//	"machine" name
-//	"login" name
-//	"password" name
+//	machine <name>
+//	login <name>
+//	password <name>
 //
 // (others are ignored here)
 //
@@ -19,7 +19,7 @@
 // Example usage:
 //
 //	endpoint := "http://my.server.com/
-//	username, password := netrc.ReadConfig(endpoint, ".netrc", os.Getenv("HOME")+"/.netrc")
+//	username, password := netrc.ReadConfig(endpoint, ".netrc", netrc.DefaultNetRC)
 package netrc
 
 import (
@@ -27,22 +27,48 @@ import (
 	"io"
 	urlpkg "net/url"
 	"os"
+	"path/filepath"
 )
 
+const NetRC = ".netrc"
+
+// DefaultNetRC is "~/.netrc"
+var DefaultNetRC = filepath.Join(os.Getenv("HOME"), NetRC)
+
 // ReadConfig reads login and password configuration from file(s), typically ~/.netrc.
-// The uri specifies the target system, which can be specified as an endpoint URL or
-// simply as a host/domain name.
-// The returned username and password are blank unless a match was found.
-func ReadConfig(uri string, netrc ...string) (string, string) {
+// The uri specifies the target system hostname. This can be specified as an endpoint URL or
+// simply as a host or domain name.
+//
+// The netrc files are searched in sequence to find the first match.
+//
+// The returned username (i.e. login) and password are blank unless a match was found.
+func ReadConfig(uri, netrc1 string, netrc ...string) (username string, password string) {
+	return readConfig(func(f string) (io.ReadCloser, error) { return os.Open(f) }, uri, netrc1, netrc...)
+}
+
+func readConfig(open func(string) (io.ReadCloser, error), uri, netrc1 string, netrc ...string) (string, string) {
 	host := uri
 	url, err := urlpkg.Parse(uri)
 	if err == nil {
 		host = url.Host
 	}
 
+	if len(netrc) == 0 {
+		netrc = []string{}
+	}
+
+	var file io.ReadCloser
+	file, err = open(netrc1)
+	if err == nil {
+		u, p, ok := parseConfig(file, host)
+		file.Close()
+		if ok {
+			return u, p
+		}
+	}
+
 	for _, name := range netrc {
-		var file io.ReadCloser
-		file, err = os.Open(name)
+		file, err = open(name)
 		if err == nil {
 			u, p, ok := parseConfig(file, host)
 			file.Close()
