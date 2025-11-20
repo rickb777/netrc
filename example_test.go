@@ -2,6 +2,7 @@ package netrc_test
 
 import (
 	"fmt"
+	"os"
 
 	"github.com/rickb777/netrc"
 )
@@ -14,12 +15,16 @@ func ExampleReadConfig_home_directory() {
 	fmt.Printf("password=%s\n", password)
 }
 
-func ExampleReadConfig_two_files() {
+func ExampleReadConfig_three_files() {
 	endpoint := "http://my.server.com/"
-	// This searches two files:
-	//  1. in the current directory, and then
-	//  2. in the home directory (but only if the first doesn't exist or doesn't contain the endpoint).
-	username, password := netrc.ReadConfig(endpoint, "./.netrc", netrc.DefaultNetRC)
+
+	// This searches up to three files. It ignores absent files and returns as soon as the first match is
+	// found, if any.
+	username, password := netrc.ReadConfig(endpoint,
+		"./.netrc",         // in the current directory
+		os.Getenv("NETRC"), // the file location given by NETRC, which is the conventional environment variable to use
+		netrc.DefaultNetRC) // i.e. "~/.netrc" in the home directory
+
 	fmt.Printf("username=%s\n", username)
 	fmt.Printf("password=%s\n", password)
 }

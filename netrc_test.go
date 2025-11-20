@@ -20,10 +20,7 @@ func TestParseConfig(t *testing.T) {
 		"alpha|secret": `machine my.server.com:444 login alpha password secret`,
 
 		// ignore default and match machine
-		"beta|secret": `default
-			  login a1
-			  password aaa111
-			
+		"beta|secret": `			
 			machine my.server.com
 			  login xyz
 			  password xyz123
@@ -31,15 +28,16 @@ func TestParseConfig(t *testing.T) {
 			machine my.server.com:444
 			  login beta 
 			  password secret
-			  account acct`,
+			  account acct
+
+			default
+			  login a1
+			  password aaa111`,
 
 		// ignore machine and match default
-		"gamma|secret": `default login gamma
-			  password secret
-			
-			machine other.server.com
-			  login xyz
-			  password xyz123`,
+		"gamma|secret": `			
+			machine other.server.com login xyz password xyz123
+			default login gamma password secret`,
 	}
 	for e, input := range cases {
 		l, p, _ := parseConfig(strings.NewReader(input), u.Host)
