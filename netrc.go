@@ -24,6 +24,7 @@ package netrc
 
 import (
 	"bufio"
+	"bytes"
 	"io"
 	urlpkg "net/url"
 	"os"
@@ -83,7 +84,7 @@ func readConfig(open func(string) (io.ReadCloser, error), uri, netrc1 string, ne
 
 func parseConfig(file io.Reader, host string) (string, string, bool) {
 	var machine, login, password string
-	scanner := bufio.NewScanner(file)
+	scanner := bufio.NewScanner(&dropComments{inner: file})
 	scanner.Split(bufio.ScanWords)
 	inDefault := false
 
@@ -120,4 +121,36 @@ func parseConfig(file io.Reader, host string) (string, string, bool) {
 	}
 
 	return login, password, false
+}
+
+type dropComments struct {
+	inner   io.Reader
+	comment bool
+}
+
+func (d *dropComments) Read(p []byte) (n int, err error) {
+	n, err = d.inner.Read(p)
+	if err != nil {
+		return n, err
+	}
+
+	hash := 0
+	for {
+		if d.comment {
+			nl := bytes.IndexByte(p[hash:n], '\n') + hash
+			if nl < 0 {
+				return n, err
+			}
+			d.comment = false
+			copy(p[hash:], p[nl+1:])
+			n += hash - (nl + 1)
+			hash = 0
+		} else {
+			hash = bytes.IndexByte(p[:n], '#')
+			if hash < 0 {
+				return n, err
+			}
+			d.comment = true
+		}
+	}
 }

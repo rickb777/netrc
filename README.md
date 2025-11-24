@@ -49,6 +49,11 @@ This is returned if none of the preceding `machine` statements were matched.
 The default is normally expected to be at the end of the file after all the other settings, but the `ReadConfig` 
 function does not enforce this.
 
+## Comments
+
+Not all `.netrc` implementations support comments. However, in this API, all text from '#' to the end of line assumed
+to be a comment and is ignored.
+
 ## See also
 
 [GNU inetutils](https://www.gnu.org/software/inetutils/manual/html_node/The-_002enetrc-file.html)

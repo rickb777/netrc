@@ -20,15 +20,19 @@ func TestParseConfig(t *testing.T) {
 		"alpha|secret": `machine my.server.com:444 login alpha password secret`,
 
 		// ignore default and match machine
-		"beta|secret": `			
+		"beta|secret": `# a comment	
 			machine my.server.com
 			  login xyz
 			  password xyz123
 			
+			# just another comment
 			machine my.server.com:444
 			  login beta 
 			  password secret
-			  account acct
+
+			#machine my.server.com:444
+			#  login beta 
+			#  password ignore-me
 
 			default
 			  login a1
