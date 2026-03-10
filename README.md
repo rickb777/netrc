@@ -51,8 +51,8 @@ function does not enforce this.
 
 ## Comments
 
-Not all `.netrc` implementations support comments. However, in this API, all text from '#' to the end of line assumed
-to be a comment and is ignored.
+Not all `.netrc` implementations support comments. However, in this API, all text from `#` to the end of line 
+is assumed to be a comment and is ignored.
 
 ## See also
 
